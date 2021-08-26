@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>...</title>
+    <script src="js/vue.js"></script>
+    <script src="js/json.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <div class="dialogue" v-html="html"></div>
+
+
+    <div class="version-finally version" v-if=0>
+      <!--外圈大心-->
+      <div class="heart heart1"></div>
+      <!--里面小心-->
+      <div class="heart heart2"></div>
+    </div>
+  </div>
+
+<script type="text/javascript">
+var app = new Vue({
+  name: '心跳',
+  el: '#app',
+  data: {
+    // x: 0,
+    html:'',
+    errorClass:'',
+    class:'',
+    temporaryHtml:'',
+    timer:null,
+    timer2:null,
+    full:full
+  },
+  methods: {
+    /*程序 1.0*/
+    /* 删除程序 */
+      removeTimer(timer){
+        clearInterval(timer);
+        timer = null;
+      },
+      deleteText(text){
+        var text2 = text;
+        return ()=> {　　　　　
+          if(text2 != ''){ 
+            this.html += text2.substr(0,1);
+            text2 = text2.substr(1);
+          }else{
+            this.removeTimer(this.timer)
+            this.timer = setTimeout(()=>{
+              this.html=`<span class='error'>${this.html}</span>`
+              this.removeTimer(this.timer)
+              this.timer2  = setTimeout(()=>{ this.html='';this.steps1(this.full['steps1'],'cutover');this.removeTimer(this.timer2)},400)
+            }, 300);
+          }
+　　　　}
+      },
+      addText(text){
+        var text2 = text;
+        return ()=> {　　　
+          if(text2 != ''){ 
+            this.html += text2.substr(0,1);
+            text2 = text2.substr(1);
+          }
+        }
+      },
+      app(){
+        this.steps1(this.full['steps1'],'textEnd') 
+      },
+      steps1(stepsObj,steps){
+          switch(steps){
+            case 'textEnd':           
+              this.timer = setInterval(this.deleteText(stepsObj[steps].join()), 100);
+              break;
+            case 'text': 
+              console.log('正文');
+              this.timer = setInterval(this.addText(stepsObj[steps].join()), 100);
+              break;
+            case 'cutover':
+              console.log('切换语法')  
+          }
+      },
+      steps2(){},
+      steps3(){},
+  },
+  mounted(){
+    this.app()
+    // this.full = full
+  },
+  beforeDestroy(){
+    clearInterval(this.timer);
+  }
+})
+</script>
+</body>
+</html>
