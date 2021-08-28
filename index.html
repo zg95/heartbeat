@@ -9,10 +9,23 @@
 </head>
 <body>
   <div id="app">
-    <div class="dialogue" v-html="html"></div>
-
-
-    <div class="version-finally version" v-if=0>
+    <div id=myby class="dialogue" :class='dialogueClass' v-html="html" v-if="ifEnd"></div>
+    <div class="voice" v-if="voice">
+       <i>S</i>   
+        <div class="ze" >
+          <template v-if="ze">
+            <span>英</span>/<span>中</span>
+          </template>
+          <template v-else>
+            <span>中</span>/<span>英</span>
+          </template>
+      </div>
+    </div>
+    <div class="version-finally version" :class =imgClass>
+        <div class="heart heart1"></div>
+        <div class="heart heart2"></div>
+    </div>
+    <div class="version-finally version" v-if="0">
       <!--外圈大心-->
       <div class="heart heart1"></div>
       <!--里面小心-->
@@ -30,9 +43,26 @@ var app = new Vue({
     errorClass:'',
     class:'',
     temporaryHtml:'',
+    dialogueClass:null,
+    
+    full:full,
+
+    ze:true,
+    voice:false,
+
     timer:null,
     timer2:null,
-    full:full
+
+    imgClass:{
+      state1:false,
+      state2:false,
+      state3:false,
+      state4:false,
+      state5:false,
+      state6:false,
+      state7:false
+    },
+    ifEnd:true
   },
   methods: {
     /*程序 1.0*/
@@ -52,39 +82,130 @@ var app = new Vue({
             this.timer = setTimeout(()=>{
               this.html=`<span class='error'>${this.html}</span>`
               this.removeTimer(this.timer)
-              this.timer2  = setTimeout(()=>{ this.html='';this.steps1(this.full['steps1'],'cutover');this.removeTimer(this.timer2)},400)
-            }, 300);
+              this.timer2  = setTimeout(()=>{ 
+                this.html='';this.removeTimer(this.timer2);this.timer2 = null;this.steps1(this.full['steps1'],'cutover');},400)
+            }, 200);
           }
 　　　　}
       },
-      addText(text){
+      addText(text,Fun){
         var text2 = text;
         return ()=> {　　　
           if(text2 != ''){ 
             this.html += text2.substr(0,1);
-            text2 = text2.substr(1);
+            text2 = text2.substr(1);  
+            var divscll = document.getElementById('myby');
+            divscll.scrollTop = divscll.scrollHeight;         
+          }else{
+            this.removeTimer(this.timer)
+            if(Fun)
+              Fun()
           }
         }
       },
       app(){
-        this.steps1(this.full['steps1'],'textEnd') 
+        this.steps1(this.full['steps1'],'textEnd')
+        console.log('开始')
+      },
+      addDialogueClass(){
+        this.timer2  = setTimeout(()=>{ 
+          this.dialogueClass = 'dialogue-style'
+          this.removeTimer(this.timer2);
+          this.timer2 = null;
+          this.timer2  = setTimeout(()=>{ 
+            this.removeTimer(this.timer2);
+            this.timer2 = null;
+            this.steps1(this.full['steps1'],'text2') 
+          },4000)
+        },1000)
+        
       },
       steps1(stepsObj,steps){
           switch(steps){
             case 'textEnd':           
-              this.timer = setInterval(this.deleteText(stepsObj[steps].join()), 100);
+              this.timer = setInterval(this.deleteText(stepsObj[steps].join()), 100 );
               break;
             case 'text': 
-              console.log('正文');
-              this.timer = setInterval(this.addText(stepsObj[steps].join()), 100);
+              this.timer = setInterval(this.addText(stepsObj[steps].join(),this.addDialogueClass), 200);
               break;
-            case 'cutover':
-              console.log('切换语法')  
+            case 'text2':   
+              this.timer = setInterval(this.addText(stepsObj[steps].join(),this.initsteps2), 200);
+              break;
+            case 'cutover': 
+              this.timer2  = setTimeout(()=>{ 
+                this.voice = true;
+                this.removeTimer(this.timer2);
+                this.timer2 = null;
+                this.timer2  = setTimeout(()=>{ 
+                  this.ze = false;
+                  this.removeTimer(this.timer2);
+                  this.timer2 = null;
+                  this.timer2  = setTimeout(()=>{ 
+                    this.voice = false;
+                    this.removeTimer(this.timer2);
+                    this.timer2 = null;
+                    this.steps1(this.full['steps1'],'text')
+                  },400)
+                },500)
+              },400);
+              break
+            
           }
       },
-      steps2(){},
-      
-      steps3(){},
+
+      steps2(stepsObj,steps){
+        switch(steps){
+          case 'text': 
+            this.timer = setInterval(this.addText(stepsObj[steps].join(),this.showState(1)), 200);
+            break
+          case 'text2': 
+            this.timer = setInterval(this.addText(stepsObj[steps].join(),this.showState(2)), 200);
+            break  
+          case 'text3': 
+            this.timer = setInterval(this.addText(stepsObj[steps].join(),this.showState(3)), 200);
+            break
+          case 'text4': 
+            this.timer = setInterval(this.addText(stepsObj[steps].join(),this.showState(4)), 200);
+            break    
+          case 'text5': 
+            this.timer = setInterval(this.addText(stepsObj[steps].join(),this.showState(5)), 200);
+            break
+          case 'text6': 
+            this.timer = setInterval(this.addText(stepsObj[steps].join(),this.showState(6)), 200);
+            break
+          case 'text7': 
+            this.timer = setInterval(this.addText(stepsObj[steps].join(),this.showState(7)), 200);
+            break   
+          case 'end': 
+            this.timer = setInterval(this.addText(stepsObj[steps].join(),this.showState('end')), 200);
+            break                             
+        }
+      },
+      initsteps2(){
+        this.steps2(this.full['steps2'],'text')
+      },
+      showState(index){
+        return ()=> {　　　
+          var state = 'state'+index;
+          if(index!=7){
+            var text = 'text'+(index-0+1)
+          }else{
+            var text = 'end'
+          }
+          this.timer2  = setTimeout(()=>{ 
+            if(index != 'end'){
+              this.imgClass[state] = true;
+            }else{
+              this.ifEnd = false
+            }
+            this.removeTimer(this.timer2);
+            this.timer2  = setTimeout(()=>{ 
+              this.steps2(this.full['steps2'],text)
+              this.removeTimer(this.timer2);
+            },2000)
+          },800)
+        }
+      },
   },
   mounted(){
     this.app()
